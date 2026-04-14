@@ -113,4 +113,8 @@ while not stop_crawling:
     page_index += 1
 
 if new_events_found > 0:
-    with open(EVENTS_FILE, 'w', encoding
+    with open(EVENTS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(events, f, ensure_ascii=False, indent=2)
+    print(f"🎉 업데이트 완료! {new_events_found}개의 기반구축사업이 캘린더에 추가되었습니다.")
+else:
+    print("🤷‍♂️ 새로 추가할 기반구축사업이 없습니다.")
