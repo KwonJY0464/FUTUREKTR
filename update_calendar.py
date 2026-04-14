@@ -9,7 +9,7 @@ import google.generativeai as genai # 2026년 기준 신규 SDK 권장
 # 1. AI 설정
 gemini_api_key = os.environ.get("GEMINI_API_KEY")
 genai.configure(api_key=gemini_api_key)
-model = genai.GenerativeModel('gemini-2.0-flash') # 최신 모델 사용
+model = genai.GenerativeModel('gemini-2.5-flash') # 최신 모델 사용
 
 # 연구원님이 캡처해주신 그 헤더 완벽 복제
 HEADERS = {
