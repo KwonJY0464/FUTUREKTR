@@ -1,74 +1,101 @@
 import json
 import requests
 import os
-import urllib.parse
+import time
+import re
+from bs4 import BeautifulSoup
+import google.generativeai as genai
 
-# 1. 인증키 설정 (GitHub Secrets에 저장된 'Decoding' 키 활용)
-RAW_KEY = os.environ.get("PUBLIC_API_KEY")
-SERVICE_KEY = RAW_KEY # 헤더 방식은 Decoding 키를 그대로 사용합니다.
+# 1. AI 설정 (일정 분석용)
+gemini_api_key = os.environ.get("GEMINI_API_KEY")
+genai.configure(api_key=gemini_api_key)
+model = genai.GenerativeModel('gemini-2.5-flash')
 
-# 2. [핵심] 연구원님이 찾으신 진짜 데이터 주소(UUID) 적용
-API_URL = "https://api.odcloud.kr/api/15130496/v1/uddi:aa0ce4e1-8b7f-4cc8-bf57-c5384ce7d568"
-
-# 3. Http 헤더 및 파라미터 설정
-headers = {
-    "accept": "*/*",
-    "Authorization": f"Infuser {SERVICE_KEY}" # 공식 문서 권장 보안 방식
+# 2. [핵심] 연구원님의 브라우저 정보를 100% 복제한 헤더
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Referer': 'https://kiat.or.kr/',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin',
+    'Sec-Fetch-User': '?1',
+    'Upgrade-Insecure-Requests': '1'
 }
 
-params = {
-    'page': 1,
-    'perPage': 100 # 한 번에 최대 100개까지 수집
-}
+BASE_URL = "https://kiat.or.kr/front/board/boardContentsListPage.do?board_id=90&MenuId=b159c9dac684471b87256f1e25404f5e"
 
-print("🏛️ 국가 공식 API 서버(KEIT 통합공고)에 접속 중...")
+def run_scrapper():
+    # 세션을 사용해 쿠키를 자동으로 관리합니다.
+    session = requests.Session()
+    
+    print("🚶 1단계: KIAT 메인 페이지에 방문하여 '통행증(Cookie)'을 발급받습니다.")
+    session.get("https://kiat.or.kr/front/user/main.do", headers=HEADERS, timeout=15)
+    time.sleep(3) # 사람처럼 잠시 대기
+    
+    print("🌐 2단계: '기반구축' 공고 게시판으로 진입합니다.")
+    response = session.get(BASE_URL, headers=HEADERS, timeout=20)
+    
+    # 인코딩 문제 해결 (한글 깨짐 방지)
+    response.encoding = 'utf-8'
+    soup = BeautifulSoup(response.text, 'html.parser')
 
-try:
-    # 보안 헤더를 포함하여 요청을 보냅니다.
-    response = requests.get(API_URL, params=params, headers=headers, timeout=20)
-    
-    print(f"📡 응답 상태 코드: {response.status_code}") # 200이 나오면 성공
-    
-    if response.status_code == 200:
-        data = response.json()
-        items = data.get('data', [])
-        print(f"📊 총 {len(items)}개의 공고 데이터를 수신했습니다.")
+    # 모든 'a' 태그 중 contentsView 가 포함된 링크 수집
+    all_links = soup.find_all('a', href=re.compile(r"contentsView"))
+    print(f"📋 총 {len(all_links)}개의 게시글 링크를 발견했습니다.")
+
+    events = []
+    # 기존 데이터 로드 시도
+    if os.path.exists('events.json'):
+        with open('events.json', 'r', encoding='utf-8') as f:
+            events = json.load(f)
+
+    new_found = 0
+    for link in all_links:
+        title = link.text.strip()
         
-        new_events = []
-        for item in items:
-            # API에서 제공하는 정확한 항목명(공고명)으로 수색합니다.
-            title = item.get('공고명', '')
+        # [연구원님 커스텀 필터] 오직 '기반구축'만!
+        if "기반구축" not in title:
+            continue
             
-            # [핵심] '기반구축' 키워드 필터링
-            if "기반구축" in title:
-                print(f"✨ 신규 공고 발견: {title}")
+        # 중복 체크
+        if any(title in e.get('title', '') for e in events):
+            continue
+
+        print(f"✨ [새 사업 발견!] : {title}")
+        
+        # 상세 페이지 ID 추출
+        cid_match = re.search(r"contentsView\('([^']+)'\)", link['href'])
+        if cid_match:
+            cid = cid_match.group(1)
+            detail_url = f"https://kiat.or.kr/front/board/boardContentsView.do?board_id=90&MenuId=b159c9dac684471b87256f1e25404f5e&contents_id={cid}"
+            
+            # 상세 페이지 접속 및 AI 분석
+            try:
+                d_res = session.get(detail_url, headers=HEADERS, timeout=15)
+                d_soup = BeautifulSoup(d_res.text, 'html.parser')
+                body_text = d_soup.text.strip()[:2000] # 상단 2000자만 추출
+
+                prompt = f"다음 사업공고 텍스트에서 '사업명', '시작일', '종료일'을 추출해서 JSON으로만 대답해. 날짜: YYYY-MM-DD. [{{\"title\": \"[KIAT] {title}\", \"start\": \"YYYY-MM-DD\", \"end\": \"YYYY-MM-DD\", \"color\": \"#d32f2f\", \"url\": \"{detail_url}\"}}] \n내용: {body_text}"
+                ai_res = model.generate_content(prompt)
                 
-                # 날짜 형식 정리 (YYYY-MM-DD)
-                start_dt = item.get('접수시작일자', '')[:10]
-                end_dt = item.get('접수종료일자', '')[:10]
-                detail_url = item.get('상세페이지URL', 'https://kiat.or.kr')
+                # JSON 결과만 파싱
+                json_str = ai_res.text.replace('```json', '').replace('```', '').strip()
+                item = json.loads(json_str)
+                events.extend(item)
+                new_found += 1
+                time.sleep(2)
+            except Exception as e:
+                print(f"❌ 분석 중 오류: {e}")
 
-                new_events.append({
-                    "title": f"[공식] {title}",
-                    "start": start_dt,
-                    "end": end_dt,
-                    "color": "#1a73e8",
-                    "url": detail_url
-                })
-        
-        # 4. 결과 저장 (events.json 파일 생성/업데이트)
+    # 최종 저장
+    if new_found > 0:
         with open('events.json', 'w', encoding='utf-8') as f:
-            json.dump(new_events, f, ensure_ascii=False, indent=2)
-        
-        if new_events:
-            print(f"🎉 성공! {len(new_events)}개의 '기반구축' 사업을 캘린더에 등록했습니다.")
-        else:
-            print("🤷‍♂️ 현재 공고 리스트 중 '기반구축' 키워드에 해당하는 사업이 없습니다.")
-
-    elif response.status_code == 401:
-        print("❌ 인증 실패: GitHub Secrets에 넣은 인증키가 'Decoding' 버전이 맞는지 확인해 주세요.")
+            json.dump(events, f, ensure_ascii=False, indent=2)
+        print(f"🎉 업데이트 완료: {new_found}개의 일정이 추가되었습니다.")
     else:
-        print(f"❌ 서버 응답 에러: {response.status_code}")
+        print("🤷‍♂️ 새로 추가할 기반구축 사업이 없습니다.")
 
-except Exception as e:
-    print(f"❌ 실행 중 오류 발생: {e}")
+if __name__ == "__main__":
+    run_scrapper()
