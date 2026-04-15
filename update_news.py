@@ -1,7 +1,7 @@
 import os
 import requests
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # 깃허브 Secrets에서 키 불러오기
 CLIENT_ID = os.environ.get("NAVID")
@@ -16,12 +16,13 @@ def get_news(keyword, display=20):
     params = {"query": keyword, "display": display, "sort": "date"}
     try:
         print(f"[{keyword}] 키워드 네이버에 요청 중...")
-        res = requests.get(url, headers=headers)
+        # 💡 바로 이 부분! params=params 를 빼먹어서 에러가 났던 것을 수정했습니다.
+        res = requests.get(url, headers=headers, params=params)
+        
         if res.status_code == 200:
             print(f" ✅ 성공! ({len(res.json().get('items', []))}개 기사 수집)")
             return res.json().get('items', [])
         else:
-            # 네이버가 거절한 이유를 적나라하게 출력합니다
             print(f" ❌ 에러 발생 (코드: {res.status_code}): {res.text}")
     except Exception as e:
         print(f" ❌ 치명적 오류: {e}")
