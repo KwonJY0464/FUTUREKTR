@@ -15,22 +15,22 @@ def get_news(keyword, display=20):
     }
     params = {"query": keyword, "display": display, "sort": "date"}
     try:
+        print(f"[{keyword}] 키워드 네이버에 요청 중...")
         res = requests.get(url, headers=headers)
         if res.status_code == 200:
+            print(f" ✅ 성공! ({len(res.json().get('items', []))}개 기사 수집)")
             return res.json().get('items', [])
-    except:
-        pass
+        else:
+            # 네이버가 거절한 이유를 적나라하게 출력합니다
+            print(f" ❌ 에러 발생 (코드: {res.status_code}): {res.text}")
+    except Exception as e:
+        print(f" ❌ 치명적 오류: {e}")
     return []
 
 # 데이터 수집
-# 1번칸: 속보 (최신순으로 가져와서 48시간 라벨링)
 pane1_news = get_news("속보", 30)
-
-# 2번칸: 부처/기관 소식 합산
 combined_keywords = "산업부 KIAT 기후부 산업혁신기반구축"
 pane2_news = get_news(combined_keywords, 30)
-
-# 3번칸: 개별 키워드 모니터링 (클릭 시 전환용)
 keywords = ["호르무즈", "트럼프", "유가", "코스피"]
 pane3_data = {kw: get_news(kw, 20) for kw in keywords}
 
@@ -46,4 +46,4 @@ final_data = {
 with open("news.json", "w", encoding="utf-8") as f:
     json.dump(final_data, f, ensure_ascii=False, indent=2)
 
-print("✅ news.json 업데이트 완료")
+print("✅ news.json 업데이트 시도 완료")
