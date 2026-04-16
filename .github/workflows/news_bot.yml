@@ -1,31 +1,59 @@
 name: News Dashboard Bot
 
 on:
+
   schedule:
-    - cron: '*/30 * * * *' # 30분마다 실행
-  workflow_dispatch:      # 
+
+    - cron: '*/30 * * * *'
+
+  workflow_dispatch:
 
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
+
     steps:
+
       - uses: actions/checkout@v3
+
       - name: Set up Python
+
         uses: actions/setup-python@v4
+
         with:
+
           python-version: '3.10'
+
       - name: Install dependencies
-        run: pip install requests
+
+        run: pip install requests google-generativeai
+
       - name: Run Scraper
+
         env:
+
           NAVID: ${{ secrets.NAVID }}
+
           NAVPASS: ${{ secrets.NAVPASS }}
+
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
         run: python update_news.py
+
       - name: Commit and Push
+
         run: |
+
           git config --global user.name "KTR-News-Bot"
+
           git config --global user.email "bot@github.com"
+
           git add news.json
-          git commit -m "Auto-update news (30min)" || exit 0
-          git pull --rebase origin main   # 💡 교통사고 방지용 코드 (충돌 해결)
+
+          git commit -m "Auto-update with AI summary" || exit 0
+
+          git pull --rebase origin main
+
           git push
