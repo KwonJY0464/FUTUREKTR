@@ -5,24 +5,27 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 
-# 1. API 키 세팅 (깃허브 시크릿에서 가져옴)
+# 1. API 키 세팅
 ASSEMBLY_API_KEY = os.environ.get("ASSEMBLY_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
+# 💡 사령관님이 획득한 진짜 서비스 ID 탑재!
+SERVICE_ID = "ALLSCHEDULE"
+
 # 2. 국회일정 통합 API 호출 (오늘 이후 데이터)
-URL = f"https://open.assembly.go.kr/portal/openapi/nwzbkafmavshvabbi?KEY={ASSEMBLY_API_KEY}&Type=json&pIndex=1&pSize=50"
+URL = f"https://open.assembly.go.kr/portal/openapi/{SERVICE_ID}?KEY={ASSEMBLY_API_KEY}&Type=json&pIndex=1&pSize=50"
 
 def fetch_assembly_schedule():
     try:
         response = requests.get(URL)
         data = response.json()
         
-        # 💡 방어 로직: 정상적인 데이터('nwzbkafmavshvabbi')가 안 왔을 때 진짜 이유를 출력!
-        if 'nwzbkafmavshvabbi' not in data:
-            print(f"⚠️ 국회 API 거절/오류 메세지: {data}")
+        # 💡 방어 로직: 서비스 ID가 올바른지 확인
+        if SERVICE_ID not in data:
+            print(f"⚠️ 국회 API 에러 발생: {data}")
             return []
             
-        rows = data['nwzbkafmavshvabbi'][1].get('row', [])
+        rows = data[SERVICE_ID][1].get('row', [])
         
         today = datetime.now().strftime("%Y-%m-%d")
         important_meetings = []
@@ -31,7 +34,7 @@ def fetch_assembly_schedule():
             meet_date = row.get('MEET_DT', '')
             committee = row.get('COMMITTEE_NM', '')
             
-            # KTR 소관 상임위(산자중기위, 과방위, 환노위) 및 본회의만 필터링 + 오늘 이후 일정만
+            # KTR 소관 상임위 및 본회의 필터링
             if meet_date >= today and any(keyword in committee for keyword in ["산업통상자원", "본회의", "과학기술", "환경노동"]):
                 important_meetings.append({
                     "date": meet_date,
@@ -62,7 +65,6 @@ def summarize_with_gemini(schedule_data):
     """
     
     try:
-        # 💡 Gemma 3 27B 모델 사용
         response = client.models.generate_content(
             model='gemma-3-27b-it',
             contents=prompt,
@@ -80,7 +82,7 @@ if __name__ == "__main__":
     print("국회 일정 수집 시작...")
     schedules = fetch_assembly_schedule()
     
-    # 최근 5개 일정만 추림 (화면 표시용)
+    # 최근 5개 일정만 추림
     top_schedules = sorted(schedules, key=lambda x: (x['date'], x['time']))[:5]
     ai_summary = summarize_with_gemini(top_schedules)
     
@@ -90,7 +92,6 @@ if __name__ == "__main__":
         "summary": ai_summary
     }
     
-    # assembly.json 파일로 저장
     with open("assembly.json", "w", encoding="utf-8") as f:
         json.dump(final_data, f, ensure_ascii=False, indent=2)
         
