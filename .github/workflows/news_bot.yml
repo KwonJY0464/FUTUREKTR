@@ -1,9 +1,13 @@
 name: News Aggregator Bot
 
+name: News Aggregator Bot
+
 on:
   schedule:
-    - cron: '*/30 * * * *'  # 30분마다 무조건 실행
-  workflow_dispatch: # 수동 실행 버튼 (필수)
+    # 매시 12분과 43분에 실행 (00, 30분 정체 구간 회피)
+    - cron: '12 * * * *'
+    - cron: '43 * * * *'
+  workflow_dispatch: # 수동 실행 버튼 유지
   
 jobs:
 
