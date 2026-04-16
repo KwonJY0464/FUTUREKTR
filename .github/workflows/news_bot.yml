@@ -1,7 +1,5 @@
 name: News Aggregator Bot
 
-name: News Aggregator Bot
-
 on:
   schedule:
     # 매시 12분과 43분에 실행 (00, 30분 정체 구간 회피)
