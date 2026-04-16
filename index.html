@@ -7,30 +7,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg: #ffffff; --text: #222; --card: #fdfdfd; --border: #e0e0e0; 
-            --accent: #000000; /* 선택: 블랙 */
-            --unselected: #333333; /* 미선택: 차콜 */
-            --left-width: 50%; /* 💡 데스크톱 기본 너비 50%로 상향 */
+            --bg: #ffffff; 
+            --text: #222; 
+            --card: #fdfdfd; 
+            --border: #e0e0e0; 
+            --accent: #000000;      /* 선택 시: 블랙 */
+            --unselected: #777777;  /* 미선택 시: 차콜(진회색) */
+            --news-title: #004a99;  /* 뉴스 제목: 살짝 파란색 */
+            --left-width: 50%;      /* 기본 설정: 50% 반반 */
         }
-        [data-theme='dark'] { --bg: #121212; --text: #e0e0e0; --card: #1e1e1e; --border: #333; --accent: #ffffff; --unselected: #444444; }
+        [data-theme='dark'] { 
+            --bg: #121212; 
+            --text: #e0e0e0; 
+            --card: #1e1e1e; 
+            --border: #333; 
+            --accent: #ffffff;      /* 다크모드 선택: 화이트 */
+            --unselected: #555555;  /* 다크모드 미선택: 어두운 회색 */
+            --news-title: #59a5ff; 
+        }
 
         body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 100; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; border-bottom: 1px solid var(--border); background: var(--bg); z-index: 100; }
         
-        /* 💡 세련된 모드 전환 버튼 (블랙 & 차콜) */
-        .mode-tabs { display: flex; gap: 8px; background: #f0f0f0; padding: 4px; border-radius: 12px; }
-        [data-theme='dark'] .mode-tabs { background: #252525; }
-        
+        /* 💡 버튼 색을 완전히 뺀 텍스트 스위치 디자인 */
+        .mode-tabs { display: flex; gap: 25px; align-items: center; }
         .mode-btn { 
-            padding: 8px 16px; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 8px; 
-            cursor: pointer; transition: all 0.2s ease; background: var(--unselected); color: #bbb;
+            font-size: 1.2rem; font-weight: 700; border: none; background: none; padding: 0;
+            cursor: pointer; transition: color 0.2s ease; color: var(--unselected);
+            font-family: 'Nanum Myeongjo', serif; /* 명조 계열로 고급감 유지 */
         }
-        .mode-btn.active { background: var(--accent); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        [data-theme='dark'] .mode-btn.active { color: #000; }
+        .mode-btn.active { color: var(--accent); position: relative; }
+        /* 선택된 메뉴 아래에 아주 얇은 표시선만 추가 (원치 않으시면 제거 가능) */
+        .mode-btn.active::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 2px; background: var(--accent); }
 
-        /* 레이아웃 */
         .wrapper { display: flex; flex: 1; min-height: 0; position: relative; transition: opacity 0.3s ease; }
-        
         .pane-left { width: var(--left-width); min-width: 350px; display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; }
         
         .resizer { 
@@ -41,40 +51,44 @@
         .resizer::after { content: "||"; color: var(--border); font-size: 10px; }
 
         .pane-right { flex: 1; display: grid; grid-template-rows: 1fr 1fr; gap: 15px; padding: 15px; min-width: 400px; }
-
-        .pane { background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .pane-header { padding: 12px 15px; font-weight: bold; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.01); font-size: 0.85rem; letter-spacing: -0.02em; }
+        .pane { background: var(--card); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+        .pane-header { padding: 12px 15px; font-weight: bold; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.01); font-size: 0.85rem; color: var(--unselected); }
         .scroll-content { flex: 1; overflow-y: auto; padding: 5px 10px; }
         
-        /* 뉴스/국회 아이템 공통 */
-        .item { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+        /* 💡 뉴스 제목 폰트 키우고 파란색 적용 */
+        .item { padding: 18px 15px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
         .item:hover { background: rgba(0, 0, 0, 0.02); }
-        .item h3 { font-size: 0.95rem; margin: 0 0 8px 0; color: var(--accent); line-height: 1.4; font-weight: 700; }
-        .item p { font-size: 0.88rem; margin: 0; line-height: 1.6; color: var(--text); opacity: 0.8; }
-        .item .meta { font-size: 0.75rem; color: #999; margin-top: 8px; display: block; }
+        .item h3 { 
+            font-size: 1.15rem; /* 기존보다 1단계 크게 */
+            margin: 0 0 10px 0; 
+            color: var(--news-title); /* 살짝 파란색 */
+            line-height: 1.45; 
+            font-weight: 700; 
+            letter-spacing: -0.03em;
+        }
+        .item p { font-size: 0.95rem; margin: 0; line-height: 1.65; color: var(--text); opacity: 0.85; }
+        .item .meta { font-size: 0.8rem; color: #999; margin-top: 10px; display: block; }
 
-        .ai-summary-box { padding: 18px; font-size: 0.95rem; line-height: 1.7; color: var(--text); }
-
-        .tab-btn { padding: 3px 10px; border-radius: 6px; border: 1px solid var(--border); background: none; color: #888; cursor: pointer; font-size: 0.75rem; margin-left: 5px; font-weight: 600; }
+        .ai-summary-box { padding: 20px; font-size: 1.05rem; line-height: 1.8; color: var(--text); }
+        .tab-btn { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border); background: none; color: #888; cursor: pointer; font-size: 0.75rem; margin-left: 5px; font-weight: 600; }
         .tab-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,0,0,0.03); }
 
-        /* 📱 모바일 최적화 (세로 배치) */
         @media (max-width: 768px) {
             body { overflow-y: auto; height: auto; }
-            header { position: sticky; top: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+            header { position: sticky; top: 0; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
             .wrapper { flex-direction: column; opacity: 1 !important; }
             .pane-left { width: 100% !important; min-width: 0; height: auto; padding: 10px; }
             .pane-right { width: 100%; min-width: 0; height: auto; display: flex; flex-direction: column; padding: 10px; }
             .resizer { display: none; }
-            .pane { height: 500px; margin-bottom: 10px; } /* 모바일에서 각 패널 높이 고정 */
+            .pane { height: 550px; margin-bottom: 15px; }
         }
     </style>
 </head>
 <body data-theme="light">
     <header>
         <div class="mode-tabs">
-            <button id="mode-news" class="mode-btn active" onclick="switchMode('news')">뉴스수집기</button>
-            <button id="mode-assembly" class="mode-btn" onclick="switchMode('assembly')">국회수집기</button>
+            <span id="mode-news" class="mode-btn active" onclick="switchMode('news')">뉴스수집기</span>
+            <span id="mode-assembly" class="mode-btn" onclick="switchMode('assembly')">국회수집기</span>
         </div>
         <button style="background:none; border:none; font-size:1.2rem; cursor:pointer;" onclick="toggleTheme()" id="themeIcon">🌙</button>
     </header>
@@ -82,20 +96,18 @@
     <div class="wrapper" id="mainWrapper">
         <div class="pane-left">
             <div class="pane" style="height:100%">
-                <div class="pane-header"><div id="pane1-header">1. 인기뉴스</div> <span id="time-1" style="font-size:0.7rem; color:#999;"></span></div>
+                <div class="pane-header"><div id="pane1-header">인기뉴스</div> <span id="time-1"></span></div>
                 <div id="pane1-content" class="scroll-content"></div>
             </div>
         </div>
-
         <div class="resizer" id="resizer"></div>
-
         <div class="pane-right">
             <div class="pane">
-                <div class="pane-header"><div id="pane2-header">2. 부처/기관 <span id="pane2-tabs"></span></div><span id="time-2" style="font-size:0.7rem; color:#999;"></span></div>
+                <div class="pane-header"><div id="pane2-header">부처/기관 <span id="pane2-tabs"></span></div><span id="time-2"></span></div>
                 <div id="pane2-content" class="scroll-content"></div>
             </div>
             <div class="pane">
-                <div class="pane-header"><div id="pane3-header">3. 모니터링 <span id="pane3-tabs"></span></div><span id="time-3" style="font-size:0.7rem; color:#999;"></span></div>
+                <div class="pane-header"><div id="pane3-header">AI 분석 브리핑 <span id="pane3-tabs"></span></div><span id="time-3"></span></div>
                 <div id="pane3-content" class="scroll-content"></div>
             </div>
         </div>
@@ -145,7 +157,6 @@
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`mode-${mode}`).classList.add('active');
             
-            // 모바일이 아닐 때만 페이드 효과
             if (window.innerWidth > 768) wrapper.style.opacity = 0;
             
             setTimeout(async () => {
@@ -156,9 +167,9 @@
         }
 
         async function loadNewsData() {
-            document.getElementById('pane1-header').innerHTML = `1. 인기뉴스`;
-            document.getElementById('pane2-header').innerHTML = `2. 부처/기관 <span id="pane2-tabs"></span>`;
-            document.getElementById('pane3-header').innerHTML = `3. 모니터링 <span id="pane3-tabs"></span>`;
+            document.getElementById('pane1-header').innerHTML = `인기뉴스`;
+            document.getElementById('pane2-header').innerHTML = `부처/기관 <span id="pane2-tabs"></span>`;
+            document.getElementById('pane3-header').innerHTML = `AI 분석 브리핑`;
             try {
                 const res = await fetch(`news.json?t=${Date.now()}`); 
                 allData = await res.json();
@@ -166,25 +177,27 @@
                 ['pane2', 'pane3'].forEach(id => {
                     const n = id.slice(-1); const kws = Object.keys(allData[id]);
                     const t = document.getElementById(`${id}-tabs`);
-                    t.innerHTML = kws.map((kw, i) => `<button class="tab-btn ${i===0?'active':''}" onclick="switchTab(${n},'${kw}',this)">${kw}</button>`).join('');
-                    switchTab(n, kws[0], t.firstChild);
+                    if(t) {
+                        t.innerHTML = kws.map((kw, i) => `<button class="tab-btn ${i===0?'active':''}" onclick="switchTab(${n},'${kw}',this)">${kw}</button>`).join('');
+                        switchTab(n, kws[0], t.firstChild);
+                    }
                 });
-                const ts = `업데이트: ${allData.last_updated.substring(11, 16)}`;
+                const ts = `KTR 미래전략실 | ${allData.last_updated.substring(11, 16)}`;
                 ['1','2','3'].forEach(n => document.getElementById(`time-${n}`).innerText = ts);
             } catch (e) { console.error(e); }
         }
 
         async function loadAssemblyData() {
-            document.getElementById('pane1-header').innerHTML = `🏛️ 핵심 의사일정`;
-            document.getElementById('pane2-header').innerHTML = `📜 입법/정책 동향`;
-            document.getElementById('pane3-header').innerHTML = `🤖 Gemma 3 27B 요약`;
+            document.getElementById('pane1-header').innerHTML = `핵심 의사일정`;
+            document.getElementById('pane2-header').innerHTML = `입법/정책 동향`;
+            document.getElementById('pane3-header').innerHTML = `Gemma 3 27B 전략 요약`;
             try {
                 const res = await fetch(`assembly.json?t=${Date.now()}`);
                 const data = await res.json();
                 renderItems('pane1-content', data.schedules);
-                document.getElementById('pane2-content').innerHTML = `<div style="padding:40px; text-align:center; opacity:0.5;">의안 데이터 연동 대기 중</div>`;
-                document.getElementById('pane3-content').innerHTML = `<div class="ai-summary-box">${data.summary ? data.summary.replace(/\n/g, '<br>') : '요약 중...'}</div>`;
-                const ts = `업데이트: ${data.last_updated.substring(11, 16)}`;
+                document.getElementById('pane2-content').innerHTML = `<div style="padding:50px; text-align:center; opacity:0.4;">의안 데이터 API 연동 대기 중</div>`;
+                document.getElementById('pane3-content').innerHTML = `<div class="ai-summary-box">${data.summary ? data.summary.replace(/\n/g, '<br>') : '요약 정보가 없습니다.'}</div>`;
+                const ts = `KTR 국회상황판 | ${data.last_updated.substring(11, 16)}`;
                 ['1','2','3'].forEach(n => document.getElementById(`time-${n}`).innerText = ts);
             } catch (e) { console.error(e); }
         }
