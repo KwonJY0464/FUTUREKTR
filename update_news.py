@@ -14,37 +14,45 @@ client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 KST = timezone(timedelta(hours=9))
 
 def get_batch_summaries(news_items):
-    """기사 10개를 한 번에 묶어서 제미나이에게 전달"""
     if not news_items: return []
     
     prompt_content = ""
     for idx, item in enumerate(news_items):
-        # HTML 태그 및 특수문자 제거
-        clean_desc = re.sub('<[^>]*>', '', item['description']).replace('&quot;', '"')
-        prompt_content += f"[{idx}] 제목: {item['title']}\n내용: {clean_desc}\n\n"
+        prompt_content += f"ID: {idx}\n제목: {item['title']}\n내용: {item['description']}\n\n"
 
     prompt = (
-        f"너는 전문 뉴스 요약가이다. 다음 뉴스 목록을 보고 각 [idx] 번호에 맞춰 핵심을 2줄 이내로 요약해.\n"
-        f"반드시 '[idx] 요약내용' 형식만 출력하고, 인사말이나 추가 설명은 절대 하지 마.\n\n"
+        f"너는 전문 뉴스 요약가이다. 다음 뉴스 목록을 보고 각 ID에 맞춰 핵심을 2줄 이내로 요약해.\n"
+        f"반드시 다음 JSON 형식을 지켜서 응답해: [{{'id': 0, 'summary': '요약내용'}}, ...]\n"
+        f"인사말 없이 오직 JSON 배열만 출력해.\n\n"
         f"{prompt_content}"
     )
 
     try:
-        response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
-        raw_output = response.text.strip().split('\n')
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config={'response_mime_type': 'application/json'} # 💡 JSON 형식 강제
+        )
         
-        summaries = {}
-        for line in raw_output:
-            match = re.match(r'\[(\d+)\]\s*(.*)', line)
-            if match:
-                summaries[int(match.group(1))] = match.group(2)
+        results = json.loads(response.text)
+        summaries_dict = {item['id']: item['summary'] for item in results}
         
-        # 만약 AI가 번호를 누락했을 경우를 대비한 Fallback
-        return [summaries.get(i, "내용 요약 중 오류가 발생했습니다.") for i in range(len(news_items))]
+        final_summaries = []
+        for i, item in enumerate(news_items):
+            if i in summaries_dict:
+                final_summaries.append(summaries_dict[i])
+            else:
+                # 💡 요약 실패 시: 원문 앞에 태그를 달아 출력
+                clean_desc = re.sub('<[^>]*>', '', item['description']).replace('&quot;', '"')
+                final_summaries.append(f"(요약 실패) {clean_desc[:80]}...")
+                
+        return final_summaries
+        
     except Exception as e:
-        print(f"Batch 요약 에러: {e}")
-        return [re.sub('<[^>]*>', '', item['description'])[:90] + "..." for item in news_items]
-
+        print(f"Batch 요약 치명적 에러: {e}")
+        # 전체 에러 시에도 모든 기사에 원문 내용이라도 채워줌
+        return [f"(엔진 오류) {re.sub('<[^>]*>', '', item['description'])[:80]}..." for item in news_items]
+        
 def fetch_news(keyword, count=15, apply_filter=True):
     """뉴스 수집 및 필터링 (KST 날짜 포함)"""
     url = "https://openapi.naver.com/v1/search/news.json"
