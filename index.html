@@ -43,6 +43,19 @@
         .item h3 { font-size: 1.2rem; margin: 0 0 10px 0; color: var(--news-title); display: flex; align-items: center; gap: 8px; }
         .item p { font-size: 0.95rem; margin: 0; line-height: 1.6; opacity: 0.85; }
         .type-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        #pane2-tabs span, #pane3-tabs span {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+            color: var(--unselected);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        #pane2-tabs span.active {
+            color: var(--news-title);
+            border-bottom: 2px solid var(--news-title);
+        }
 
         @media (max-width: 768px) {
             body { overflow-y: auto; height: auto; }
@@ -145,7 +158,6 @@
             document.getElementById('pane1-title').innerText = "핵심 의사일정";
             document.getElementById('pane2-title').innerText = "입법/정책 동향";
             document.getElementById('pane3-title').innerText = "요약";
-            document.getElementById('pane2-tabs').innerHTML = ''; document.getElementById('pane3-tabs').innerHTML = '';
             try {
                 const res = await fetch(`assembly.json?t=${Date.now()}`); const data = await res.json();
                 renderItems('pane1-content', data.schedules);
