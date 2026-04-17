@@ -186,25 +186,31 @@
             }
         }
 
-        async function loadAssemblyData() {
+        async function loadAssemblyData() {  // 1. 제목을 먼저 바꿉니다. (이 과정에서 기존 뉴스 탭 스팬은 자동 삭제됨)
             document.getElementById('pane1-title').innerText = "핵심 의사일정";
-            document.getElementById('pane2-title').innerHTML = "입법/정책 동향";
-            document.getElementById('pane3-title').innerHTML = "AI 요약";
-            document.getElementById('pane2-tabs').innerHTML = '';
-            document.getElementById('pane3-tabs').innerHTML = '';
+            document.getElementById('pane2-title').innerText = "입법/정책 동향"; // innerText 사용 권장
+            document.getElementById('pane3-title').innerText = "AI 요약";
+
+    // 💡 중요: 여기서 document.getElementById('pane2-tabs') 등을 호출하면 에러가 나므로 삭제함
 
             try {
                 const res = await fetch(`assembly.json?t=${Date.now()}`);
                 if (!res.ok) throw new Error();
                 const data = await res.json();
-                
+        
+        // 데이터 렌더링
                 renderItems('pane1-content', data.schedules);
-                document.getElementById('pane2-content').innerHTML = `<div style="padding:50px; text-align:center; opacity:0.4;">의안 데이터 API 연동 대기 중</div>`;
-                document.getElementById('pane3-content').innerHTML = `<div class="ai-box">${data.summary ? data.summary.replace(/\n/g, '<br>') : '요약 정보가 없습니다.'}</div>`;
-                
+            document.getElementById('pane2-content').innerHTML = `<div style="padding:50px; text-align:center; opacity:0.4;">의안 데이터 API 연동 대기 중</div>`;
+            document.getElementById('pane3-content').innerHTML = `<div class="ai-box">${data.summary ? data.summary.replace(/\n/g, '<br>') : '요약 정보가 없습니다.'}</div>`;
+        
+        // 업데이트 시간 표시
                 const ts = `업데이트: ${data.last_updated.substring(11, 16)}`;
-                ['1','2','3'].forEach(n => document.getElementById(`time-${n}`).innerText = ts);
+                ['1','2','3'].forEach(n => {
+                const timeEl = document.getElementById(`time-${n}`);
+                if (timeEl) timeEl.innerText = ts;
+                });
             } catch (e) {
+                console.error("국회 데이터 로드 실패:", e); // 디버깅용 로그
                 document.getElementById('pane1-content').innerHTML = "<div style='padding:20px;'>데이터가 아직 생성되지 않았습니다.</div>";
                 document.getElementById('pane2-content').innerHTML = "";
                 document.getElementById('pane3-content').innerHTML = "";
