@@ -66,17 +66,34 @@ h1 { font-family: 'Nanum Myeongjo', serif; font-size: 1.5rem; margin: 0; cursor:
     content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background: var(--accent); 
 }
 
-/* 💡 단일 달력 및 네비게이션 화살표 스타일 */
-.single-calendar { padding: 5px 15px; }
-.cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size: 1.15rem; padding: 0 5px; }
+/* 💡 달력 스타일 (스크롤 및 간격 정밀 조정) */
+.single-calendar { padding: 0; }
+.cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: bold; font-size: 1.15rem; padding: 10px 5px 0 5px; }
 .cal-nav-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--unselected); transition: color 0.2s; padding: 5px 15px; }
 .cal-nav-btn:hover { color: var(--accent); }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 4px; font-size: 0.9rem; }
-.cal-day { padding: 12px 4px; border-radius: 6px; cursor: pointer; transition: 0.2s; position: relative; border: 1px solid transparent; }
+
+/* 💡 날짜 칸: Flexbox로 숫자와 점을 중앙 밀착 */
+.cal-day { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 6px 2px; /* 상하 패딩을 줄여서 날씬하게 */
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    position: relative; 
+    border: 1px solid transparent; 
+    gap: 3px; /* 숫자와 점 사이의 간격 */
+}
 .cal-day:hover { background: rgba(0,0,0,0.03); border-color: var(--border); }
 .cal-day.selected { background: var(--accent); color: var(--bg); font-weight: bold; }
 .cal-day.today { font-weight: bold; color: var(--news-title); text-decoration: underline; }
-.cal-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; margin: 0 2px; }
+
+/* 💡 점 컨테이너: 텅 비어도 높이를 유지해서 칸 찌그러짐 방지 */
+.cal-dots-container { display: flex; gap: 3px; height: 6px; align-items: center; justify-content: center; }
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
 .dot-sanja { background: var(--sanja-color); }
 .dot-gihyu { background: var(--gihyu-color); }
 
