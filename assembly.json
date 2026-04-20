@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-18 05:26:45",
+  "last_updated": "2026-04-20 09:29:08",
   "schedules": [
     {
       "date": "2026-04-30",
@@ -34,6 +34,38 @@
       "type": "gihyu"
     },
     {
+      "date": "2026-04-24",
+      "time": "10:00~12:00",
+      "title": "과학기술 기반 산업 안전 패러다임 전환을 위한 정책토론회",
+      "committee": "",
+      "location": "의원회관 제11간담회의실(216호)",
+      "type": "sanja"
+    },
+    {
+      "date": "2026-04-23",
+      "time": "13:00~17:00",
+      "title": "에너지 전환 시대, 지속가능한 성장 전략을 묻다",
+      "committee": "",
+      "location": "국회도서관 소회의실",
+      "type": "gihyu"
+    },
+    {
+      "date": "2026-04-23",
+      "time": "10:00",
+      "title": "제434회국회(임시회) 제2차 전체회의",
+      "committee": "농림축산식품해양수산위원회",
+      "location": null,
+      "type": "session"
+    },
+    {
+      "date": "2026-04-23",
+      "time": "10:00",
+      "title": "에너지 대전환 시대, 전력망 투자 어떻게 할 것인가",
+      "committee": "",
+      "location": "의원회관 신관 제3세미나실",
+      "type": "gihyu"
+    },
+    {
       "date": "2026-04-22",
       "time": "14:00~17:00",
       "title": "K콘텐츠 산업 동반성장을 위한 정책방향과 과제",
@@ -59,10 +91,26 @@
     },
     {
       "date": "2026-04-21",
+      "time": "09:30",
+      "title": "제7회 국회미래산업포럼 &ldquo;산업지원 정책의 패러다임 전환을 위한 정책토론회&rdquo; (의원회관 제2소회의실)",
+      "committee": "",
+      "location": null,
+      "type": "sanja"
+    },
+    {
+      "date": "2026-04-21",
       "time": "07:30~09:00",
       "title": "왜 한국 농업은 '산업'이 되지 못했는가?",
       "committee": "",
       "location": "의원회관 제7간담회의실(210호)",
+      "type": "sanja"
+    },
+    {
+      "date": "2026-04-20",
+      "time": "15:30",
+      "title": "프렌차이즈 산업, 더 나은 내일을 위한 토론회",
+      "committee": "",
+      "location": "의원회관 신관 제1세미나실",
       "type": "sanja"
     },
     {
@@ -180,14 +228,6 @@
     {
       "date": "2026-04-15",
       "time": "10:00",
-      "title": "제434회국회(임시회) 제3차 전체회의",
-      "committee": "재정경제기획위원회",
-      "location": null,
-      "type": "session"
-    },
-    {
-      "date": "2026-04-15",
-      "time": "10:00",
       "title": "제434회국회(임시회) 제1차 전체회의",
       "committee": "외교통일위원회",
       "location": null,
@@ -196,10 +236,10 @@
     {
       "date": "2026-04-15",
       "time": "10:00",
-      "title": "지속가능한 AI 시대를 위한 탄소중립과 산업정책 토론회",
-      "committee": "",
-      "location": "의원회관 신관 제1세미나실",
-      "type": "sanja"
+      "title": "제434회국회(임시회) 제3차 전체회의",
+      "committee": "재정경제기획위원회",
+      "location": null,
+      "type": "session"
     },
     {
       "date": "2026-04-15",
@@ -207,6 +247,14 @@
       "title": "콘텐츠산업 특성을 반영한 기업육성 정책 차별화 방안 토론회",
       "committee": "",
       "location": "의원회관 제8간담회의실(211호)",
+      "type": "sanja"
+    },
+    {
+      "date": "2026-04-15",
+      "time": "10:00",
+      "title": "지속가능한 AI 시대를 위한 탄소중립과 산업정책 토론회",
+      "committee": "",
+      "location": "의원회관 신관 제1세미나실",
       "type": "sanja"
     },
     {
@@ -228,18 +276,18 @@
     {
       "date": "2026-04-14",
       "time": "14:00",
-      "title": "제434회국회(임시회) 제1차 전체회의",
-      "committee": "국방위원회",
-      "location": null,
-      "type": "session"
-    },
-    {
-      "date": "2026-04-14",
-      "time": "14:00",
       "title": "AI 바이오헬스산업 지원 전문생산기술연구소의 역할과 과제",
       "committee": "",
       "location": "의원회관 신관 제2세미나실",
       "type": "sanja"
+    },
+    {
+      "date": "2026-04-14",
+      "time": "14:00",
+      "title": "제434회국회(임시회) 제1차 전체회의",
+      "committee": "국방위원회",
+      "location": null,
+      "type": "session"
     },
     {
       "date": "2026-04-14",
@@ -420,10 +468,10 @@
     {
       "date": "2026-04-07",
       "time": "10:00",
-      "title": "제434회국회(임시회) 제1차 예산결산소위원회",
-      "committee": "산업통상자원중소벤처기업위원회",
+      "title": "제434회국회(임시회) 제1차 전체회의",
+      "committee": "국토교통위원회",
       "location": null,
-      "type": "sanja"
+      "type": "session"
     },
     {
       "date": "2026-04-07",
@@ -436,10 +484,10 @@
     {
       "date": "2026-04-07",
       "time": "10:00",
-      "title": "제434회국회(임시회) 제1차 전체회의",
-      "committee": "국토교통위원회",
+      "title": "제434회국회(임시회) 제1차 예산결산소위원회",
+      "committee": "산업통상자원중소벤처기업위원회",
       "location": null,
-      "type": "session"
+      "type": "sanja"
     },
     {
       "date": "2026-04-07",
@@ -485,7 +533,7 @@
       "date": "2026-04-06",
       "time": "15:00",
       "title": "제434회국회(임시회) 제1차 전체회의",
-      "committee": "문화체육관광위원회",
+      "committee": "농림축산식품해양수산위원회",
       "location": null,
       "type": "session"
     },
@@ -493,7 +541,7 @@
       "date": "2026-04-06",
       "time": "15:00",
       "title": "제434회국회(임시회) 제1차 전체회의",
-      "committee": "농림축산식품해양수산위원회",
+      "committee": "문화체육관광위원회",
       "location": null,
       "type": "session"
     },
@@ -604,18 +652,18 @@
     {
       "date": "2026-04-02",
       "time": "10:00",
-      "title": "제433회국회(임시회) 제3차 전체회의",
-      "committee": "보건복지위원회",
-      "location": null,
-      "type": "session"
-    },
-    {
-      "date": "2026-04-02",
-      "time": "10:00",
       "title": "제433회국회(임시회) 제1차 고용노동법안심사소위원회",
       "committee": "기후에너지환경노동위원회",
       "location": null,
       "type": "gihyu"
+    },
+    {
+      "date": "2026-04-02",
+      "time": "10:00",
+      "title": "제433회국회(임시회) 제3차 전체회의",
+      "committee": "보건복지위원회",
+      "location": null,
+      "type": "session"
     },
     {
       "date": "2026-04-02",
@@ -652,14 +700,6 @@
     {
       "date": "2026-04-01",
       "time": "10:00",
-      "title": "제433회국회(임시회) 제1차 전체회의",
-      "committee": "국토교통위원회",
-      "location": null,
-      "type": "session"
-    },
-    {
-      "date": "2026-04-01",
-      "time": "10:00",
       "title": "제433회국회(임시회) 제3차 전체회의",
       "committee": "과학기술정보방송통신위원회",
       "location": null,
@@ -670,6 +710,14 @@
       "time": "10:00",
       "title": "제433회국회(임시회) 제3차 전체회의",
       "committee": "교육위원회",
+      "location": null,
+      "type": "session"
+    },
+    {
+      "date": "2026-04-01",
+      "time": "10:00",
+      "title": "제433회국회(임시회) 제1차 전체회의",
+      "committee": "국토교통위원회",
       "location": null,
       "type": "session"
     }
