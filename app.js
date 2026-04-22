@@ -205,7 +205,7 @@ function updateTimeDisplays(ts, mode) {
 }
 
 // ==========================================
-// 🚀 국회의원 타겟 추적 레이더 (최종 본회의/사진/링크 패치)
+// 🚀 국회의원 타겟 추적 레이더 (최종 무적 패치)
 // ==========================================
 
 window.searchMember = function() {
@@ -214,20 +214,19 @@ window.searchMember = function() {
     if (!name) { alert("의원 이름을 입력하십시오."); return; }
     if (!window.radarDB) { alert("파이썬 정찰대가 만든 레이더 DB(radar_db.json)가 아직 로드되지 않았습니다."); return; }
 
-    const info = window.radarDB.profiles.find(p => p.HG_NM === name);
+    const info = window.radarDB.profiles.find(p => (p.HG_NM || "").trim() === name);
     if (!info) {
         DOM.pane2Content.innerHTML = `<div style="padding:40px; text-align:center; color:#e74c3c;">제22대 현역 의원 중 '${name}' 의원을 찾을 수 없습니다.</div>`;
         DOM.pane3Content.innerHTML = '';
         return;
     }
 
-    // 💡 사진 우선순위 적용 (API가 내려준 텍스트 주소가 최우선)
+    // 💡 사진 주소: DB에 저장된 원본 주소가 있으면 쓰고, 정~ 없으면 국회 기본 사진첩으로 우회 (프론트 방어막)
     const photoUrl = info.NAAS_PIC || `https://www.assembly.go.kr/static/portal/img/open_data/member/${info.MONA_CD}.jpg`;
 
-    // 💡 홈페이지 링크 동적 생성 (정보가 있을 때만 클릭 가능하도록 처리)
-    let nameHtml = `<h2 style="margin: 0; font-size: 1.6rem; color: var(--news-title);">${info.HG_NM}</h2>`;
+    let displayName = info.HG_NM;
     if (info.HOMEPAGE && info.HOMEPAGE.startsWith("http")) {
-        nameHtml = `<h2 style="margin: 0; font-size: 1.6rem; color: var(--news-title); cursor: pointer;" onclick="window.open('${info.HOMEPAGE}', '_blank')" title="홈페이지 열기">🔗 ${info.HG_NM}</h2>`;
+        displayName = `<a href="${info.HOMEPAGE}" target="_blank" style="color:var(--news-title); text-decoration:none;" title="의원 홈페이지/SNS 이동">🔗 ${info.HG_NM}</a>`;
     }
 
     DOM.pane2Title.innerText = "의원 프로필 상세";
@@ -235,10 +234,10 @@ window.searchMember = function() {
         <div style="padding: 15px; background: var(--card); height: 100%; box-sizing: border-box;">
             
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                <img src="${info.NAAS_PIC}" onerror="this.src='https://www.assembly.go.kr/photo/${info.MONA_CD}.jpg'" 
-                     style="width: 120px; height: 160px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); background: #333;">
+                <img src="${photoUrl}" onerror="this.src='https://www.assembly.go.kr/photo/${info.MONA_CD}.jpg'" 
+                     style="width: 85px; height: 110px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); background: #333;">
                 <div>
-                    ${nameHtml}
+                    <h2 style="margin: 0; font-size: 1.6rem;">${displayName}</h2>
                     <span style="display: inline-block; margin-top: 5px; padding: 3px 8px; background: var(--accent); color: var(--bg); border-radius: 4px; font-weight: bold; font-size: 0.85rem;">
                         ${info.POLY_NM}
                     </span>
@@ -276,7 +275,7 @@ window.searchMember = function() {
         </div>
     `;
 
-    DOM.pane3Title.innerHTML = `활동 내역 (최근 데이터 기준)
+    DOM.pane3Title.innerHTML = `활동 내역 (최근 30건 기준)
         <span id="pane3-tabs">
             <button class="tab-btn active" onclick="switchActivityTab('${name}', 'bills', this)">발의의안</button>
             <button class="tab-btn" onclick="switchActivityTab('${name}', 'minutes', this)">회의발언</button>
@@ -292,20 +291,25 @@ window.switchActivityTab = function(name, type, btn) {
 
     let items = [];
     if (type === 'bills') {
-        items = window.radarDB.bills.filter(b => 
-            (b.RST_PROPOSER && b.RST_PROPOSER.includes(name)) || (b.PROPOSER && b.PROPOSER.includes(name))
-        ).map(r => ({ title: `[의안] ${r.BILL_NM}`, meta: `제안일: ${r.PROPOSER_DT}`, link: r.LINK_URL }));
+        items = (window.radarDB.bills || []).filter(b => 
+            ((b.RST_PROPOSER || "").includes(name)) || ((b.PROPOSER || "").includes(name))
+        ).map(r => ({ title: `[의안] ${r.BILL_NM || '제목없음'}`, meta: `제안일: ${r.PROPOSER_DT || ''}`, link: r.LINK_URL || '#' }));
     } else if (type === 'minutes') {
-        items = window.radarDB.minutes.filter(m => 
-            (m.SPK_FIRST_NM && m.SPK_FIRST_NM.includes(name)) || (m.SUB_NAME && m.SUB_NAME.includes(name))
-        ).map(r => ({ title: `[발언] ${r.COMM_NAME} - ${r.SUB_NAME}`, meta: `회의일: ${r.MEET_DATE}`, link: r.CONF_LINK_URL || r.PDF_LINK_URL || '#' }));
+        items = (window.radarDB.minutes || []).filter(m => 
+            ((m.SPK_FIRST_NM || "").includes(name)) || ((m.SUB_NAME || "").includes(name))
+        ).map(r => ({ title: `[발언] ${r.COMM_NAME || ''} - ${r.SUB_NAME || ''}`, meta: `회의일: ${r.MEET_DATE || ''}`, link: r.CONF_LINK_URL || r.PDF_LINK_URL || '#' }));
     } else if (type === 'votes') {
-        // 💡 3번 칸: 파이썬이 AGE=22로 긁어온 표결 데이터 출력
-        items = window.radarDB.votes.filter(v => v.HG_NM === name)
-        .map(r => ({
-            title: `[투표] ${r.BILL_NM}`,
-            meta: `결과: <b style="color:${r.RESULT === '찬성' ? 'var(--sanja-color)' : '#e74c3c'}">${r.RESULT}</b> | 일시: ${r.DATE}`,
-            link: '#'
+        // 💡 3번 칸: 방어막 완벽 전개. 불량 데이터(null)가 들어와도 절대 뻗지 않습니다.
+        items = (window.radarDB.votes || []).filter(v => (v.HG_NM || "").trim() === name)
+        .map(r => {
+            let resultColor = 'var(--text)';
+            if(r.RESULT_VOTE_NM === '찬성') resultColor = 'var(--sanja-color)';
+            if(r.RESULT_VOTE_NM === '반대') resultColor = '#e74c3c';
+            
+            return { 
+                title: `[투표] ${r.BILL_NM || '알 수 없는 의안'}`, 
+                meta: `결과: <b style="color:${resultColor};">${r.RESULT_VOTE_NM || '확인불가'}</b> | 표결일: ${r.VOTE_DATE || '날짜없음'}`, 
+                link: '#' 
             };
         });
     }
