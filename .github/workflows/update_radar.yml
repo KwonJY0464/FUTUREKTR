@@ -3,7 +3,7 @@ name: Update Target Radar DB
 on:
   schedule:
     # 매일 오전 8시, 낮 12시, 오후 6시 (KST 기준)에 DB 갱신
-    - cron: '0 23,3,9 * * *'
+   - cron: '0 0 * * 1,5'
   workflow_dispatch:
 
 jobs:
