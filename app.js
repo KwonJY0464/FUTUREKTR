@@ -72,20 +72,22 @@ window.switchMode = async function(mode) {
     if (activeBtn) activeBtn.classList.add('active');
 
     if (mode === 'news') {
+        // 💡 뉴스 모드: 좌측 패널 원래 크기(350px)로 복구
+        document.documentElement.style.setProperty('--left-width', '350px');
+        
         if (DOM.newsLeftPane) DOM.newsLeftPane.style.display = 'flex';
         if (DOM.assemblyLeftPane) DOM.assemblyLeftPane.style.display = 'none';
-        
-        // 💡 뉴스 모드일 때 레이더 숨기고, 두 패널의 크기를 1:1로 원복
         if (DOM.searchContainer) DOM.searchContainer.style.display = 'none';
         if (DOM.profilePane) DOM.profilePane.style.flex = '1';
         if (DOM.activityPane) DOM.activityPane.style.flex = '1';
         
         await loadNewsData();
     } else {
+        // 💡 국회 모드: 좌측 패널 화면의 25% (25vw)로 축소
+        document.documentElement.style.setProperty('--left-width', '25vw');
+        
         if (DOM.newsLeftPane) DOM.newsLeftPane.style.display = 'none';
         if (DOM.assemblyLeftPane) DOM.assemblyLeftPane.style.display = 'flex';
-        
-        // 💡 국회 모드일 때 레이더 표시하고, 프로필 패널(1.6)과 활동 패널(1) 비율 조정
         if (DOM.searchContainer) DOM.searchContainer.style.display = 'flex';
         if (DOM.profilePane) DOM.profilePane.style.flex = '1.6';
         if (DOM.activityPane) DOM.activityPane.style.flex = '1';
@@ -205,7 +207,7 @@ function updateTimeDisplays(ts, mode) {
 }
 
 // ==========================================
-// 🚀 국회의원 타겟 추적 레이더 
+// 🚀 국회의원 타겟 추적 레이더 (최종 최적화)
 // ==========================================
 
 window.searchMember = function() {
@@ -220,14 +222,16 @@ window.searchMember = function() {
         return;
     }
 
-    const photoUrl = `https://www.assembly.go.kr/static/portal/img/open_data/member/${info.MONA_CD}.jpg`;
+    // 💡 사진 우선순위 적용 (NAAS_PIC 먼저, 없으면 대체 이미지)
+    const photoUrl = info.NAAS_PIC || `https://www.assembly.go.kr/static/portal/img/open_data/member/${info.MONA_CD}.jpg`;
 
     DOM.pane2Title.innerText = "의원 프로필 상세";
     DOM.pane2Content.innerHTML = `
         <div style="padding: 15px; background: var(--card); height: 100%; box-sizing: border-box;">
+            
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
                 <img src="${photoUrl}" onerror="this.src='https://www.assembly.go.kr/photo/${info.MONA_CD}.jpg'" 
-                     style="width: 85px; height: 110px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border);">
+                     style="width: 85px; height: 110px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); background: #333;">
                 <div>
                     <h2 style="margin: 0; font-size: 1.6rem; color: var(--news-title);">${info.HG_NM}</h2>
                     <span style="display: inline-block; margin-top: 5px; padding: 3px 8px; background: var(--accent); color: var(--bg); border-radius: 4px; font-weight: bold; font-size: 0.85rem;">
@@ -267,7 +271,7 @@ window.searchMember = function() {
         </div>
     `;
 
-    DOM.pane3Title.innerHTML = `활동 내역 (최근 1000건 기준)
+    DOM.pane3Title.innerHTML = `활동 내역 (최근 데이터 기준)
         <span id="pane3-tabs">
             <button class="tab-btn active" onclick="switchActivityTab('${name}', 'bills', this)">발의의안</button>
             <button class="tab-btn" onclick="switchActivityTab('${name}', 'minutes', this)">회의발언</button>
@@ -289,10 +293,11 @@ window.switchActivityTab = function(name, type, btn) {
     } else if (type === 'minutes') {
         items = window.radarDB.minutes.filter(m => 
             (m.SPK_FIRST_NM && m.SPK_FIRST_NM.includes(name)) || (m.SUB_NAME && m.SUB_NAME.includes(name))
-        ).map(r => ({ title: `[발언] ${r.COMM_NAME} - ${r.SUB_NAME}`, meta: `회의일: ${r.MEET_DATE}`, link: r.CONF_LINK_URL || r.PDF_LINK_URL }));
+        ).map(r => ({ title: `[발언] ${r.COMM_NAME} - ${r.SUB_NAME}`, meta: `회의일: ${r.MEET_DATE}`, link: r.CONF_LINK_URL || r.PDF_LINK_URL || '#' }));
     } else if (type === 'votes') {
+        // 💡 3번 칸: 파이썬이 긁어온 표결 데이터 출력
         items = window.radarDB.votes.filter(v => v.HG_NM === name)
-        .map(r => ({ title: `[투표] ${r.BILL_NM}`, meta: `결과: ${r.RESULT_VOTE_NM} | ${r.VOTE_DATE}`, link: '#' }));
+        .map(r => ({ title: `[투표] ${r.BILL_NM}`, meta: `결과: <b>${r.RESULT_VOTE_NM}</b> | 표결일: ${r.VOTE_DATE}`, link: '#' }));
     }
 
     renderItems('pane3-content', items);
