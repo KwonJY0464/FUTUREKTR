@@ -1,5 +1,5 @@
 window.allData = null;
-window.radarDB = null; // 레이더 DB 보관소
+window.radarDB = null;
 window.currentMode = 'news';
 window.currentCalDate = new Date();
 
@@ -25,21 +25,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         time3:               document.getElementById('time-3'),
         themeIcon:           document.getElementById('themeIcon'),
         searchContainer:     document.getElementById('member-search-container'),
-        searchInput:         document.getElementById('member-search-input')
+        searchInput:         document.getElementById('member-search-input'),
+        profilePane:         document.getElementById('profile-pane'),
+        activityPane:        document.getElementById('activity-pane')
     };
 
-    // 엔터키 지원
     if (DOM.searchInput) {
         DOM.searchInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') searchMember();
         });
     }
 
-    // 앱 시작 시 파이썬이 구워놓은 레이더 DB 사전 적재
     try {
         const radarRes = await fetch(`radar_db.json?t=${Date.now()}`);
         if (radarRes.ok) window.radarDB = await radarRes.json();
-    } catch(e) { console.warn("레이더 DB가 아직 준비되지 않았습니다."); }
+    } catch(e) { console.warn("레이더 DB 대기 중..."); }
 
     const resizer = document.getElementById('resizer');
     let isResizing = false;
@@ -67,7 +67,6 @@ window.toggleTheme = function() {
 
 window.switchMode = async function(mode) {
     window.currentMode = mode;
-
     document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(`mode-${mode}`);
     if (activeBtn) activeBtn.classList.add('active');
@@ -75,12 +74,22 @@ window.switchMode = async function(mode) {
     if (mode === 'news') {
         if (DOM.newsLeftPane) DOM.newsLeftPane.style.display = 'flex';
         if (DOM.assemblyLeftPane) DOM.assemblyLeftPane.style.display = 'none';
-        if (DOM.searchContainer) DOM.searchContainer.style.display = 'none'; // 뉴스에선 무조건 숨김
+        
+        // 💡 뉴스 모드일 때 레이더 숨기고, 두 패널의 크기를 1:1로 원복
+        if (DOM.searchContainer) DOM.searchContainer.style.display = 'none';
+        if (DOM.profilePane) DOM.profilePane.style.flex = '1';
+        if (DOM.activityPane) DOM.activityPane.style.flex = '1';
+        
         await loadNewsData();
     } else {
         if (DOM.newsLeftPane) DOM.newsLeftPane.style.display = 'none';
         if (DOM.assemblyLeftPane) DOM.assemblyLeftPane.style.display = 'flex';
-        if (DOM.searchContainer) DOM.searchContainer.style.display = 'flex'; // 국회에선 무조건 노출
+        
+        // 💡 국회 모드일 때 레이더 표시하고, 프로필 패널(1.6)과 활동 패널(1) 비율 조정
+        if (DOM.searchContainer) DOM.searchContainer.style.display = 'flex';
+        if (DOM.profilePane) DOM.profilePane.style.flex = '1.6';
+        if (DOM.activityPane) DOM.activityPane.style.flex = '1';
+        
         window.currentCalDate = new Date();
         await loadAssemblyData();
     }
@@ -95,7 +104,6 @@ function setHeaders({ title2, title3, useInnerHTML = false, clearTabs = false })
     }
 }
 
-// --- 뉴스 수집기 로직 ---
 async function loadNewsData() {
     try {
         setHeaders({ title2: '부처/기관 <span id="pane2-tabs"></span>', title3: 'AI 키워드 타게팅 <span id="pane3-tabs"></span>', useInnerHTML: true });
@@ -123,10 +131,9 @@ async function loadNewsData() {
     }
 }
 
-// --- 국회 수집기 로직 ---
 async function loadAssemblyData() {
     try {
-        setHeaders({ title2: '의원 프로필', title3: '활동 내역', clearTabs: true });
+        setHeaders({ title2: '의원 프로필 상세', title3: '활동 내역', clearTabs: true });
         const res = await fetch(`assembly.json?t=${Date.now()}`);
         if (!res.ok) throw new Error("assembly.json 로드 실패");
         const data = await res.json();
@@ -167,9 +174,7 @@ function renderSingleCalendar(schedules) {
 
 window.selectDate = function(date, el) {
     document.querySelectorAll('.cal-day').forEach(d => d.classList.remove('selected')); if (el) el.classList.add('selected');
-    if (window.allData && window.allData.schedules) {
-        renderItems('pane1-assembly-content', window.allData.schedules.filter(s => s.date === date));
-    }
+    if (window.allData && window.allData.schedules) renderItems('pane1-assembly-content', window.allData.schedules.filter(s => s.date === date));
 };
 
 function renderItems(targetId, items) {
@@ -200,14 +205,14 @@ function updateTimeDisplays(ts, mode) {
 }
 
 // ==========================================
-// 🚀 국회의원 타겟 추적 레이더 (전술 1: JSON 창고 필터링)
+// 🚀 국회의원 타겟 추적 레이더 
 // ==========================================
 
-
 window.searchMember = function() {
-    const name = document.getElementById('member-search-input').value.trim();
+    if (!DOM.searchInput) return;
+    const name = DOM.searchInput.value.trim();
     if (!name) { alert("의원 이름을 입력하십시오."); return; }
-    if (!window.radarDB) { alert("데이터베이스(radar_db.json)가 로드되지 않았습니다. 파이썬 스크립트를 먼저 실행하십시오."); return; }
+    if (!window.radarDB) { alert("파이썬 정찰대가 만든 레이더 DB(radar_db.json)가 아직 로드되지 않았습니다."); return; }
 
     const info = window.radarDB.profiles.find(p => p.HG_NM === name);
     if (!info) {
@@ -215,13 +220,11 @@ window.searchMember = function() {
         return;
     }
 
-    // 💡 2. 사진 복구 로직: MONA_CD를 활용한 공식 사진 주소 생성
     const photoUrl = `https://www.assembly.go.kr/static/portal/img/open_data/member/${info.MONA_CD}.jpg`;
 
-    // 💡 3. 2번 칸: 4열 격자 표(Table) 레이아웃 적용
     DOM.pane2Title.innerText = "의원 프로필 상세";
     DOM.pane2Content.innerHTML = `
-        <div style="padding: 15px; background: var(--card);">
+        <div style="padding: 15px; background: var(--card); height: 100%; box-sizing: border-box;">
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
                 <img src="${photoUrl}" onerror="this.src='https://www.assembly.go.kr/photo/${info.MONA_CD}.jpg'" 
                      style="width: 85px; height: 110px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border);">
@@ -264,8 +267,14 @@ window.searchMember = function() {
         </div>
     `;
 
-    // 3번 칸 탭 업데이트 (공란 방지를 위해 데이터 존재 여부 확인 로직 강화)
-    setupMemberActivityTabs(name);
+    DOM.pane3Title.innerHTML = `활동 내역 (최근 1000건 기준)
+        <span id="pane3-tabs">
+            <button class="tab-btn active" onclick="switchActivityTab('${name}', 'bills', this)">발의의안</button>
+            <button class="tab-btn" onclick="switchActivityTab('${name}', 'minutes', this)">회의발언</button>
+            <button class="tab-btn" onclick="switchActivityTab('${name}', 'votes', this)">본회의투표</button>
+        </span>`;
+    
+    switchActivityTab(name, 'bills', document.querySelector('#pane3-tabs .tab-btn'));
 };
 
 window.switchActivityTab = function(name, type, btn) {
@@ -273,16 +282,13 @@ window.switchActivityTab = function(name, type, btn) {
     if (btn) btn.classList.add('active');
 
     let items = [];
-    // 💡 데이터가 안 뜨는 문제 해결: 필터링 조건 완화 (includes 활용)
     if (type === 'bills') {
         items = window.radarDB.bills.filter(b => 
-            (b.RST_PROPOSER && b.RST_PROPOSER.includes(name)) || 
-            (b.PROPOSER && b.PROPOSER.includes(name))
+            (b.RST_PROPOSER && b.RST_PROPOSER.includes(name)) || (b.PROPOSER && b.PROPOSER.includes(name))
         ).map(r => ({ title: `[의안] ${r.BILL_NM}`, meta: `제안일: ${r.PROPOSER_DT}`, link: r.LINK_URL }));
     } else if (type === 'minutes') {
         items = window.radarDB.minutes.filter(m => 
-            (m.SPK_FIRST_NM && m.SPK_FIRST_NM.includes(name)) || 
-            (m.SUB_NAME && m.SUB_NAME.includes(name))
+            (m.SPK_FIRST_NM && m.SPK_FIRST_NM.includes(name)) || (m.SUB_NAME && m.SUB_NAME.includes(name))
         ).map(r => ({ title: `[발언] ${r.COMM_NAME} - ${r.SUB_NAME}`, meta: `회의일: ${r.MEET_DATE}`, link: r.CONF_LINK_URL || r.PDF_LINK_URL }));
     } else if (type === 'votes') {
         items = window.radarDB.votes.filter(v => v.HG_NM === name)
