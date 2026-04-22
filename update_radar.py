@@ -3,7 +3,6 @@ import requests
 import json
 from datetime import datetime, timedelta, timezone
 
-# 설정: KTR 전산실망이 아닌 깃허브 서버에서 안전하게 실행
 ASSEMBLY_KEY = os.environ.get("ASSEMBLY_API_KEY")
 KST = timezone(timedelta(hours=9))
 
