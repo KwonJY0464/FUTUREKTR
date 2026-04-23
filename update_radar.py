@@ -44,7 +44,7 @@ def collect_schedules(p, radar_db):
             })
 
 if __name__ == "__main__":
-    print("⚡ [작전명: 하이브리드 레이더] 47분의 고충 해결 및 일정 복구 개시...")
+    print("⚡ 일정 복구 개시...")
 
     try:
         with open("profiles_db.json", "r", encoding="utf-8") as f:
