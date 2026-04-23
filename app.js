@@ -280,15 +280,26 @@ window.switchActivityTab = function(name, type, btn) {
     if (!window.radarDB) return;
 
 if (type === 'committee') {
-        // 💡 나중에 파이썬이 던져줄 '위원회 일정' 데이터를 화면에 그릴 자리
-        items = []; 
+        items = (window.radarDB.committee || []).filter(c => c.HG_NM === name)
+        .map(r => ({
+            title: r.SCH_CN || '일정 내용 없음', // 보통글씨
+            meta: `📅 ${r.SCH_DT || ''} ⏰ ${r.SCH_TM || ''} | 🏛️ ${r.CMIT_NM || ''}`, // 작은글씨
+            link: '#'
+        }));
     } else if (type === 'plenary') {
-        // 💡 나중에 파이썬이 던져줄 '본회의 일정' 데이터를 화면에 그릴 자리
-        items = [];
+        items = (window.radarDB.plenary || []).filter(c => c.HG_NM === name)
+        .map(r => ({
+            title: r.SCH_CN || '일정 내용 없음', // 보통글씨
+            meta: `📅 ${r.SCH_DT || ''} ⏰ ${r.SCH_TM || ''} | 🏛️ ${r.CMIT_NM || '본회의'}`, // 작은글씨
+            link: '#'
+        }));
     } else if (type === 'bills') {
-        // (기존에 쓰던 발의법률안 로직 그대로 유지)
-        items = (window.radarDB.bills || []).filter(b => ((b.RST_PROPOSER || "").includes(name)) || ((b.PROPOSER || "").includes(name)))
-        .map(r => ({ title: `[의안] ${r.BILL_NM || ''}`, meta: `제안일: ${r.PROPOSER_DT || ''}`, link: r.LINK_URL || '#' }));
+        items = (window.radarDB.bills || []).filter(b => b.HG_NM === name)
+        .map(r => ({
+            title: `[의안] ${r.BILL_NAME || ''}`,
+            meta: `소관위: ${r.COMMITTEE || '미정'} | <b style="color:var(--sanja-color);">${r.STATUS}</b> (${r.DT})`,
+            link: r.LINK_URL || '#'
+        }));
     }
     renderItems('pane3-content', items);
 };
