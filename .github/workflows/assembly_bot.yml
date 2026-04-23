@@ -26,7 +26,7 @@ jobs:
           
       - name: Commit and Push
         run: |
-          git config --global user.name "KTR-Assembly-Bot"
+          git config --global user.name "AssemblyAggre-Bot"
           git config --global user.email "bot@github.com"
           git add assembly.json
           git commit -m "Auto-update Assembly" || exit 0
