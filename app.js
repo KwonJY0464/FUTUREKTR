@@ -262,14 +262,14 @@ window.searchMember = function() {
         </div>
     `;
 
-    DOM.pane3Title.innerHTML = `활동 내역 (최근 30건 기준)
+    DOM.pane3Title.innerHTML = `의원 상
         <span id="pane3-tabs">
-            <button class="tab-btn active" onclick="switchActivityTab('${name}', 'bills', this)">발의의안</button>
-            <button class="tab-btn" onclick="switchActivityTab('${name}', 'minutes', this)">회의발언</button>
-            <button class="tab-btn" onclick="switchActivityTab('${name}', 'votes', this)">본회의투표</button>
+            <button class="tab-btn active" onclick="switchActivityTab('${name}', 'committee', this)">위원회 일정</button>
+            <button class="tab-btn" onclick="switchActivityTab('${name}', 'plenary', this)">본회의 일정</button>
+            <button class="tab-btn" onclick="switchActivityTab('${name}', 'bills', this)">발의법률안</button>
         </span>`;
     
-    switchActivityTab(name, 'bills', document.querySelector('#pane3-tabs .tab-btn'));
+    switchActivityTab(name, 'committee', document.querySelector('#pane3-tabs .tab-btn'));
 };
 
 window.switchActivityTab = function(name, type, btn) {
@@ -279,21 +279,16 @@ window.switchActivityTab = function(name, type, btn) {
     let items = [];
     if (!window.radarDB) return;
 
-    if (type === 'bills') {
+if (type === 'committee') {
+        // 💡 나중에 파이썬이 던져줄 '위원회 일정' 데이터를 화면에 그릴 자리
+        items = []; 
+    } else if (type === 'plenary') {
+        // 💡 나중에 파이썬이 던져줄 '본회의 일정' 데이터를 화면에 그릴 자리
+        items = [];
+    } else if (type === 'bills') {
+        // (기존에 쓰던 발의법률안 로직 그대로 유지)
         items = (window.radarDB.bills || []).filter(b => ((b.RST_PROPOSER || "").includes(name)) || ((b.PROPOSER || "").includes(name)))
         .map(r => ({ title: `[의안] ${r.BILL_NM || ''}`, meta: `제안일: ${r.PROPOSER_DT || ''}`, link: r.LINK_URL || '#' }));
-    } else if (type === 'minutes') {
-        items = (window.radarDB.minutes || []).filter(m => ((m.SPK_FIRST_NM || "").includes(name)) || ((m.SUB_NAME || "").includes(name)))
-        .map(r => ({ title: `[발언] ${r.COMM_NAME || ''} - ${r.SUB_NAME || ''}`, meta: `회의일: ${r.MEET_DATE || ''}`, link: r.CONF_LINK_URL || r.PDF_LINK_URL || '#' }));
-    } else if (type === 'votes') {
-        items = (window.radarDB.votes || []).filter(v => (v.HG_NM || "").trim() === name)
-        .map(r => {
-            let resultColor = 'var(--text)';
-            if(r.RESULT_VOTE_NM === '찬성') resultColor = 'var(--sanja-color)';
-            if(r.RESULT_VOTE_NM === '반대') resultColor = '#e74c3c';
-            return { title: `[투표] ${r.BILL_NM || ''}`, meta: `결과: <b style="color:${resultColor};">${r.RESULT_VOTE_NM || '미투표'}</b> | 표결일: ${r.VOTE_DATE || ''}`, link: '#' };
-        });
     }
-
     renderItems('pane3-content', items);
 };
