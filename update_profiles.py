@@ -60,7 +60,8 @@ if __name__ == "__main__":
                         "SECRETARY2": m.get("SCRT_NM", ""),             
                         "MEM_TITLE": m.get("BRF_HST", ""),              
                         "HOMEPAGE": m.get("NAAS_HP_URL", ""),           
-                        "NAAS_PIC": pic_url                             
+                        "NAAS_PIC": pic_url,
+                        "NAAS_CD": m.get("NAAS_CD", "")
                     })
                     
     with open("profiles_db.json", "w", encoding="utf-8") as f:
