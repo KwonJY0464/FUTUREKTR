@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-04-24 06:27:44",
+  "last_updated": "2026-04-24 11:40:43",
   "schedules": [
     {
       "date": "2026-05-04",
@@ -26,6 +26,14 @@
       "type": "session"
     },
     {
+      "date": "2026-04-28",
+      "time": "09:30",
+      "title": "제434회국회(임시회) 제11차 전체회의(기후위기 특별위원회)",
+      "committee": "기후에너지환경노동위원회",
+      "location": null,
+      "type": "gihyu"
+    },
+    {
       "date": "2026-04-27",
       "time": "15:00~18:00",
       "title": "버리지 않고 고치는 사회: 수리할 권리와 순환경제사회전환을 위한 정책토론회",
@@ -40,6 +48,14 @@
       "committee": "",
       "location": "의원회관 제3간담회의실(203호)",
       "type": "gihyu"
+    },
+    {
+      "date": "2026-04-27",
+      "time": "10:00",
+      "title": "제434회국회(임시회) 제2차 전체회의",
+      "committee": "정보위원회",
+      "location": null,
+      "type": "session"
     },
     {
       "date": "2026-04-27",
@@ -84,10 +100,18 @@
     {
       "date": "2026-04-23",
       "time": "10:00",
-      "title": "제434회국회(임시회) 제5차 탄소중립기본법 심사 소위원회(기후위기 특별위원회)",
-      "committee": "기후에너지환경노동위원회",
+      "title": "제434회국회(임시회) 제6차 전체회의(정치개혁특별위원회)",
+      "committee": "행정안전위원회",
       "location": null,
-      "type": "gihyu"
+      "type": "session"
+    },
+    {
+      "date": "2026-04-23",
+      "time": "10:00",
+      "title": "제434회국회(임시회) 제2차 전체회의",
+      "committee": "외교통일위원회",
+      "location": null,
+      "type": "session"
     },
     {
       "date": "2026-04-23",
@@ -100,18 +124,10 @@
     {
       "date": "2026-04-23",
       "time": "10:00",
-      "title": "제434회국회(임시회) 제6차 전체회의(정치개혁특별위원회)",
-      "committee": "행정안전위원회",
+      "title": "제434회국회(임시회) 제5차 탄소중립기본법 심사 소위원회(기후위기 특별위원회)",
+      "committee": "기후에너지환경노동위원회",
       "location": null,
-      "type": "session"
-    },
-    {
-      "date": "2026-04-23",
-      "time": "10:00",
-      "title": "제434회국회(임시회) 제2차 전체회의",
-      "committee": "농림축산식품해양수산위원회",
-      "location": null,
-      "type": "session"
+      "type": "gihyu"
     },
     {
       "date": "2026-04-23",
@@ -125,7 +141,7 @@
       "date": "2026-04-23",
       "time": "10:00",
       "title": "제434회국회(임시회) 제2차 전체회의",
-      "committee": "외교통일위원회",
+      "committee": "농림축산식품해양수산위원회",
       "location": null,
       "type": "session"
     },
@@ -284,18 +300,18 @@
     {
       "date": "2026-04-16",
       "time": "10:00",
-      "title": "한반도 평화공존을 위한 남북 에너지 협력방안 마련 토론회",
-      "committee": "",
-      "location": "의원회관 신관 제1세미나실",
-      "type": "gihyu"
-    },
-    {
-      "date": "2026-04-16",
-      "time": "10:00",
       "title": "제434회국회(임시회) 제8차 전체회의(윤석열 정권 정치검찰 조작기소 의혹 사건 진상규명 국정조사특별위원회)",
       "committee": "특별위원회",
       "location": null,
       "type": "session"
+    },
+    {
+      "date": "2026-04-16",
+      "time": "10:00",
+      "title": "한반도 평화공존을 위한 남북 에너지 협력방안 마련 토론회",
+      "committee": "",
+      "location": "의원회관 신관 제1세미나실",
+      "type": "gihyu"
     },
     {
       "date": "2026-04-16",
@@ -308,14 +324,6 @@
     {
       "date": "2026-04-15",
       "time": "14:00",
-      "title": "AI 접근성과 산업 경쟁력: 정책과제와 산업 대응",
-      "committee": "",
-      "location": "의원회관 제1소회의실",
-      "type": "sanja"
-    },
-    {
-      "date": "2026-04-15",
-      "time": "14:00",
       "title": "제434회국회(임시회) 제1차 기후에너지환경법안심사소위원회",
       "committee": "기후에너지환경노동위원회",
       "location": null,
@@ -323,11 +331,11 @@
     },
     {
       "date": "2026-04-15",
-      "time": "10:00",
-      "title": "제434회국회(임시회) 제1차 전체회의",
-      "committee": "외교통일위원회",
-      "location": null,
-      "type": "session"
+      "time": "14:00",
+      "title": "AI 접근성과 산업 경쟁력: 정책과제와 산업 대응",
+      "committee": "",
+      "location": "의원회관 제1소회의실",
+      "type": "sanja"
     },
     {
       "date": "2026-04-15",
@@ -344,6 +352,14 @@
       "committee": "",
       "location": "의원회관 신관 제1세미나실",
       "type": "sanja"
+    },
+    {
+      "date": "2026-04-15",
+      "time": "10:00",
+      "title": "제434회국회(임시회) 제1차 전체회의",
+      "committee": "외교통일위원회",
+      "location": null,
+      "type": "session"
     },
     {
       "date": "2026-04-15",
@@ -516,14 +532,6 @@
     {
       "date": "2026-04-08",
       "time": "10:00",
-      "title": "제434회국회(임시회) 제1차 전체회의",
-      "committee": "법제사법위원회",
-      "location": null,
-      "type": "session"
-    },
-    {
-      "date": "2026-04-08",
-      "time": "10:00",
       "title": "콘텐츠산업 노동자 노동환경 개선을 위한 입법 토론회",
       "committee": "",
       "location": "의원회관 제3간담회의실(203호)",
@@ -534,6 +542,14 @@
       "time": "10:00",
       "title": "제434회국회(임시회) 제2차 전체회의",
       "committee": "예산결산특별위원회",
+      "location": null,
+      "type": "session"
+    },
+    {
+      "date": "2026-04-08",
+      "time": "10:00",
+      "title": "제434회국회(임시회) 제1차 전체회의",
+      "committee": "법제사법위원회",
       "location": null,
       "type": "session"
     },
@@ -572,14 +588,6 @@
     {
       "date": "2026-04-07",
       "time": "10:00",
-      "title": "제434회국회(임시회) 제1차 예산결산소위원회",
-      "committee": "산업통상자원중소벤처기업위원회",
-      "location": null,
-      "type": "sanja"
-    },
-    {
-      "date": "2026-04-07",
-      "time": "10:00",
       "title": "제434회국회(임시회) 제1차 전체회의",
       "committee": "예산결산특별위원회",
       "location": null,
@@ -592,6 +600,14 @@
       "committee": "국토교통위원회",
       "location": null,
       "type": "session"
+    },
+    {
+      "date": "2026-04-07",
+      "time": "10:00",
+      "title": "제434회국회(임시회) 제1차 예산결산소위원회",
+      "committee": "산업통상자원중소벤처기업위원회",
+      "location": null,
+      "type": "sanja"
     },
     {
       "date": "2026-04-07",
@@ -796,6 +812,14 @@
     {
       "date": "2026-04-01",
       "time": "10:00",
+      "title": "제433회국회(임시회) 제3차 전체회의",
+      "committee": "과학기술정보방송통신위원회",
+      "location": null,
+      "type": "session"
+    },
+    {
+      "date": "2026-04-01",
+      "time": "10:00",
       "title": "제433회국회(임시회) 제1차 전체회의",
       "committee": "국토교통위원회",
       "location": null,
@@ -806,14 +830,6 @@
       "time": "10:00",
       "title": "제433회국회(임시회) 제3차 전체회의",
       "committee": "교육위원회",
-      "location": null,
-      "type": "session"
-    },
-    {
-      "date": "2026-04-01",
-      "time": "10:00",
-      "title": "제433회국회(임시회) 제3차 전체회의",
-      "committee": "과학기술정보방송통신위원회",
       "location": null,
       "type": "session"
     }
